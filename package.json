@@ -1,11 +1,11 @@
 {
-  "name": "@gandalfwisdom/statey",
+  "name": "@gandalfwisdom/statebuddy",
   "version": "1.0.0",
   "description": "A standard state machine object for Roblox.",
   "repository": {
     "type": "git",
-    "url": "https://github.com/GandalfWisdom/Statey.git",
-    "directory": "src/statey/"
+    "url": "https://github.com/GandalfWisdom/StateBuddy.git",
+    "directory": "src/statebuddy/"
   },
   "keywords": [
     "Roblox",
@@ -23,7 +23,7 @@
     "access": "public"
   },
   "bugs": {
-    "url": "https://github.com/GandalfWisdom/Statey/issues"
+    "url": "https://github.com/GandalfWisdom/StateBuddy/issues"
   },
-  "homepage": "https://github.com/GandalfWisdom/Statey#readme"
+  "homepage": "https://github.com/GandalfWisdom/StateBuddy#readme"
 }

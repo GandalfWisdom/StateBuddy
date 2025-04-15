@@ -1,5 +1,5 @@
 {
-  "name": "soundbyte",
+  "name": "statebuddy",
   "globIgnorePaths": [ "**/.package-lock.json" ],
   "tree": {
     "$path": "src"
