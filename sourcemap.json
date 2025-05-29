@@ -1,0 +1,1 @@
+{"name":"statebuddy","className":"Folder","filePaths":["default.project.json"],"children":[{"name":"Shared","className":"Folder","children":[{"name":"StateBuddy","className":"ModuleScript","filePaths":["src\\Shared\\StateBuddy.lua"]}]}]}

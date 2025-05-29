@@ -58,6 +58,9 @@ end;
     @param completed StateCallback -- The function that runs when state ends. If duration is set, make sure this function returns a string value of the next state.
 ]=]
 function StateBuddy.AddState(self: StateBuddy, state_name: string, duration: number, enter: StateCallback?, started: StateCallback?, completed: StateCallback?): ()
+    local is_first_state: boolean = false;
+    if (next(self._states) == nil) then is_first_state = true; end;
+
     self._states[state_name] = {
         Name = state_name;
         Duration = duration;
@@ -65,6 +68,8 @@ function StateBuddy.AddState(self: StateBuddy, state_name: string, duration: num
         Started = started;
         Completed = completed;
     };
+
+    if (is_first_state == true) then self:ChangeState(state_name); end; -- If it is the first state added, set it as the default state.
 end;
 
 --[=[
@@ -96,7 +101,7 @@ end;
     Updates state machine. Used only when state has a duration above 0.
 ]=]
 function StateBuddy.Update(self: StateBuddy): ()
-    if not (self._current_state) then return; end;
+    if not (self._current_state) or (self._current_state == "") then return; end;
     local state_current: State = self._states[self._current_state];
     if (state_current.Duration == 0) or (state_current.Duration == nil) then return; end; --Guard clause. If duration is 0 or nil, return.
 
