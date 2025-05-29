@@ -6,6 +6,8 @@ local StateBuddy = {};
 StateBuddy.__index = StateBuddy;
 StateBuddy.ClassName = "StateBuddy";
 
+local id_increment: number = 0;
+local current_states: {[string]: string} = {};
 --[=[
     A state machine utility class that handles transitions between named states.
 
@@ -21,8 +23,9 @@ export type State = { Name: string, Duration: number?, Enter: StateCallback?, St
 export type StateBuddy = typeof(setmetatable(
     {} :: {
         _maid: Maid.Maid,
+        Name: string,
         _states: { [string]: State },
-        _current_state: string?,
+        _current_state: string,
         _duration: number?,
         _start_time: number,
     },
@@ -33,13 +36,16 @@ export type StateBuddy = typeof(setmetatable(
     Constructs a new StateBuddy object
     @return StateBuddy
 ]=]
-function StateBuddy.new(): StateBuddy
+function StateBuddy.new(object_name: string?): StateBuddy
     local self: StateBuddy = setmetatable({} :: any, StateBuddy);
     self._maid = Maid.new();
+    if (object_name == nil) then id_increment += 1; end;
+    self.Name = object_name or "StateBuddy"..tostring(id_increment);
     self._states = {};
-    self._current_state = nil;
+    self._current_state = "";
     self._duration = 0;
 
+    current_states[self.Name] = self._current_state; --Updates global state table
     return self;
 end;
 
@@ -82,6 +88,8 @@ function StateBuddy.ChangeState(self: StateBuddy, new_state: string): ()
     self._duration = next_state.Duration;
     self._start_time = workspace:GetServerTimeNow();
     if (next_state.Started) then next_state.Started(); end;
+
+    current_states[self.Name] = self._current_state; --Updates global state table
 end;
 
 --[=[
@@ -102,9 +110,21 @@ function StateBuddy.Update(self: StateBuddy): ()
 end;
 
 --[=[
+    Gets the current global state of an object name.
+    @param buddy_name string -- The name of the StateBuddy object to check.
+    @return string?
+]=]
+function StateBuddy.GetBuddyState(buddy_name: string): string?
+    if not (current_states[buddy_name]) then return; end;
+    return current_states[buddy_name];
+end;
+
+--[=[
     Cleans up the class object and sets the metatable to nil
 ]=]
 function StateBuddy.Destroy(self: StateBuddy): ()
+    current_states[self.Name] = nil;
+    id_increment -= 1;
     self._maid:DoCleaning();
     setmetatable(self :: any, nil);
 end;
