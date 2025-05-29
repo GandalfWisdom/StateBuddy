@@ -71,23 +71,23 @@ end;
     Changes state.
     @param state string -- State to change in to.
 ]=]
-function StateBuddy.ChangeState(self: StateBuddy, new_state: string): ()
+function StateBuddy.ChangeState(self: StateBuddy, new_state: string, ...: any): ()
     if (self._current_state == new_state) then return; end; --Guard Clause. Returns if attempting to change to state that the state machine is already in.
 
     local next_state: State = self._states[new_state];
     if not (next_state) then return; end; --Guard Clause. Returns if next_state does not exist.
 
     local can_enter: boolean? | string? = false;
-    if (next_state.Enter) then can_enter = next_state.Enter(); end;
+    if (next_state.Enter) then can_enter = next_state.Enter(...); end;
     if not (can_enter) then return; end; --Enter guard clause.
 
     local old_state: State? = self._states[self._current_state or ""];
-    if (old_state) and (old_state.Completed) then old_state.Completed() end; --Run completed function if it exists.
+    if (old_state) and (old_state.Completed) then old_state.Completed(...) end; --Run completed function if it exists.
 
     self._current_state = new_state;
     self._duration = next_state.Duration;
     self._start_time = workspace:GetServerTimeNow();
-    if (next_state.Started) then next_state.Started(); end;
+    if (next_state.Started) then next_state.Started(...); end;
 
     current_states[self.Name] = self._current_state; --Updates global state table
 end;
