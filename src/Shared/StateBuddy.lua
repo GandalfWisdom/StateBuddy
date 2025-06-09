@@ -142,6 +142,18 @@ end;
 function StateBuddy.GetStateFromNumber(self: StateBuddy, number: number): string
     return self.state_index_table[number] or "Idle";
 end;
+--[=[
+    Gets the state as a number when given a state name string. Used for packing bits in replication systems. 
+    @param state_name string -- State name as a string.
+    @return number -- Returns the state as a number.
+]=]
+function StateBuddy.GetIndexFromName(self: StateBuddy, state_name: string): number
+    local state_index: number = 0;
+    for index, name in ipairs(self.state_index_table) do
+        if (state_name == name) then state_index = index; break; end;
+    end;
+    return state_index;
+end;
 
 --[=[
     Cleans up the class object and sets the metatable to nil

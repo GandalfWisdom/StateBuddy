@@ -1,6 +1,6 @@
 {
   "name": "@gandalfwisdom/statebuddy",
-  "version": "1.0.5",
+  "version": "1.0.6",
   "description": "A standard state machine object for Roblox. He's your buddy that helps you manage states!",
   "repository": {
     "type": "git",
