@@ -25,6 +25,7 @@ export type StateBuddy = typeof(setmetatable(
         _maid: Maid.Maid,
         Name: string,
         _states: { [string]: State },
+        state_index_table: { [number]: string },
         _current_state: string,
         _duration: number?,
         _start_time: number,
@@ -42,6 +43,7 @@ function StateBuddy.new(object_name: string?): StateBuddy
     if (object_name == nil) then id_increment += 1; end;
     self.Name = object_name or "StateBuddy"..tostring(id_increment);
     self._states = {};
+    self.state_index_table = {};
     self._current_state = "";
     self._duration = 0;
 
@@ -69,6 +71,7 @@ function StateBuddy.AddState(self: StateBuddy, state_name: string, duration: num
         Completed = completed;
     };
 
+    table.insert(self.state_index_table, state_name); -- Adds state to index table, allowing the conversion of state as a number to a state name.
     if (is_first_state == true) then self:ChangeState(state_name); end; -- If it is the first state added, set it as the default state.
 end;
 
@@ -76,10 +79,17 @@ end;
     Changes state.
     @param state string -- State to change in to.
 ]=]
-function StateBuddy.ChangeState(self: StateBuddy, new_state: string, ...: any): ()
-    if (self._current_state == new_state) then return; end; --Guard Clause. Returns if attempting to change to state that the state machine is already in.
+function StateBuddy.ChangeState(self: StateBuddy, new_state: string | number, ...: any): ()
+    local new_state_string: string;
+    if (typeof(new_state) == "number") then 
+        new_state_string = self:GetStateFromNumber(new_state);
+    else
+        new_state_string = new_state;
+    end;
+    
+    if (self._current_state == new_state_string) then return; end; --Guard Clause. Returns if attempting to change to state that the state machine is already in.
 
-    local next_state: State = self._states[new_state];
+    local next_state: State = self._states[new_state_string];
     if not (next_state) then return; end; --Guard Clause. Returns if next_state does not exist.
 
     local can_enter: boolean? | string? = false;
@@ -89,7 +99,7 @@ function StateBuddy.ChangeState(self: StateBuddy, new_state: string, ...: any): 
     local old_state: State? = self._states[self._current_state or ""];
     if (old_state) and (old_state.Completed) then old_state.Completed(...) end; --Run completed function if it exists.
 
-    self._current_state = new_state;
+    self._current_state = new_state_string;
     self._duration = next_state.Duration;
     self._start_time = workspace:GetServerTimeNow();
     if (next_state.Started) then next_state.Started(...); end;
@@ -122,6 +132,15 @@ end;
 function StateBuddy.GetBuddyState(buddy_name: string): string?
     if not (current_states[buddy_name]) then return; end;
     return current_states[buddy_name];
+end;
+
+--[=[
+    Gets the state as a string when given a number. Used for packing bits in replication systems. 
+    @param number number -- State index as a number.
+    @return string -- Returns the state as a string.
+]=]
+function StateBuddy.GetStateFromNumber(self: StateBuddy, number: number): string
+    return self.state_index_table[number] or "Idle";
 end;
 
 --[=[
